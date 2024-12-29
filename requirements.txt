@@ -1,0 +1,9 @@
+fastapi
+scikit-learn
+uvicorn
+torch
+transformers
+gradio
+flake8
+pytest
+
