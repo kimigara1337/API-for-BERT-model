@@ -1,13 +1,11 @@
-import pytest
 from main import app, classifier
 from unittest.mock import MagicMock
-from unittest.mock import patch
 from fastapi.testclient import TestClient
 
 client = TestClient(app)
 
 # Юнит-тест. Проверка работоспособности API путем отправки зароса к корневому маршруту эндпоинта
-def test_read_root():
+def test_unit_read_root():
     response = client.get("/")
     assert response.status_code == 200
     assert response.json() == {
@@ -15,7 +13,7 @@ def test_read_root():
     }
 
 # Юнит-тест. Проверка работоспособности API путем отправки запроса по маршруту /check_prompt. Модель в целях тестирования заменяется на заглушку (возврщает "safe" при любом промпте)
-def test_api_response():
+def test_unit_api_response():
     original_method = classifier.check_on_bad_request
     classifier.check_on_bad_request = MagicMock()
     classifier.check_on_bad_request.return_value = 'safe'
@@ -30,7 +28,7 @@ def test_api_response():
     classifier.check_on_bad_request = original_method
 
 # Интеграционный тест. Проверка взаимодействия API и модели путем отправки запросов через API содержащих примеры безопасного и jailbreak промпта, проверки ответа
-def test_inference_via_api():
+def test_integration_inference_via_api():
     response = client.get("/check_prompt/", params={"prompt_input": 'How to make borsch?'}) # Безопасный промпт
     assert response.status_code == 200
     assert response.json()['result'] in [0, 1]
