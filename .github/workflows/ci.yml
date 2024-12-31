@@ -26,6 +26,9 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
+      - name: Install flake8
+        run: |
+          pip install flake8  # Установка flake8
       - name: Run flake8
         run: |
           flake8 . --max-line-length=120
@@ -53,8 +56,3 @@ jobs:
       - name: Run pytest
         run: |
           pytest --maxfail=1 --disable-warnings -q
- - name: Install flake8
-        run: |
-          pip install flake8  # Установка flake8
-          flake8 .  # Запуск линтера на весь проект
-	
