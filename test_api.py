@@ -38,3 +38,34 @@ def test_integration_inference_via_api():
     assert response.status_code == 200
     assert response.json()['result'] in [0, 1]
     assert response.json()['success'] == True
+    
+# Приемочный тест. Проверяет, что приложение корректно обрабатывает ошибки при обращении с отсутствующим input_prompt.
+def test_acceptance_error_handling():
+    response = client.get("/check_prompt/")  
+    assert response.status_code == 422  
+    json_data = response.json()
+    assert json_data["detail"][0]["msg"] == "Field required"  # Проверка сообщения об ошибке.
+
+
+# Функция отправки запроса. Используется в нагрузочных тестах
+def send_request():
+    response = client.get("/check_prompt/", params={"prompt_input": "Load test input."})
+    assert response.status_code == 200
+    json_data = response.json()
+    assert json_data["success"] is True
+
+# Нагрузочный тест. Проверяет работу приложения при нескольких последовательных запросах.
+def test_load_single_thread():
+    for _ in range(50):  
+        send_request()
+
+# Нагрузочный тест. Проверяет работу приложения при одновременных запросах.
+def test_load_multithread():
+    threads = []
+    for _ in range(20):  
+        thread = threading.Thread(target=send_request)
+        threads.append(thread)
+        thread.start()
+
+    for thread in threads:
+        thread.join()
